@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Sagir Ahmad — Steel Detailer / Tekla Modeler</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,11 +17,12 @@
     --hazard:     #C1622C;
     --hazard-2:   #E0A63A;
     --line:       #B9AF95;
-    --paper-rgb:  238,232,218;
+    --gap:        28px;   /* master horizontal padding, scaled down on mobile */
   }
 
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  html{ -webkit-text-size-adjust:100%; }
+  html,body{margin:0;padding:0; overflow-x:hidden; width:100%;}
   body{
     background:
       repeating-linear-gradient(0deg, rgba(31,58,82,0.05) 0 1px, transparent 1px 28px),
@@ -30,16 +31,18 @@
     color:var(--ink);
     font-family:'IBM Plex Sans', sans-serif;
     -webkit-font-smoothing:antialiased;
-    padding:28px 16px 80px;
+    padding:28px 16px 60px;
   }
 
   .sheet{
     max-width:900px;
+    width:100%;
     margin:0 auto;
     background:var(--paper);
     border:2px solid var(--ink);
     position:relative;
     padding:0;
+    overflow:hidden; /* keep corner ticks & content clipped to the sheet */
   }
   /* corner ticks — drafting sheet registration marks */
   .sheet::before, .sheet::after,
@@ -50,6 +53,7 @@
     border-color:var(--hazard);
     border-style:solid;
     z-index:3;
+    pointer-events:none;
   }
   .sheet::before{ top:-2px; left:-2px; border-width:4px 0 0 4px; }
   .sheet::after{ top:-2px; right:-2px; border-width:4px 4px 0 0; }
@@ -65,8 +69,9 @@
     color:var(--paper);
   }
   .tb-id{
-    flex:1 1 320px;
-    padding:26px 28px 22px;
+    flex:1 1 260px;
+    min-width:0;
+    padding:26px var(--gap) 22px;
     position:relative;
     overflow:hidden;
   }
@@ -80,38 +85,42 @@
   .tb-name{
     font-family:'Big Shoulders Display', sans-serif;
     font-weight:800;
-    font-size:clamp(38px,7vw,58px);
-    line-height:0.92;
+    font-size:clamp(30px,9vw,58px);
+    line-height:0.95;
     letter-spacing:.01em;
     margin:0 0 8px;
     text-transform:uppercase;
+    word-break:break-word;
   }
   .tb-role{
-    font-size:15px;
+    font-size:14.5px;
     font-weight:500;
     color:#C9D6DC;
     letter-spacing:.02em;
   }
   .tb-data{
-    flex:0 0 auto;
+    flex:1 1 260px;
+    min-width:0;
     display:grid;
-    grid-template-columns:repeat(2,minmax(150px,1fr));
+    grid-template-columns:repeat(2,minmax(0,1fr));
     font-family:'IBM Plex Mono', monospace;
-    font-size:12.5px;
+    font-size:12px;
     border-left:2px solid rgba(238,232,218,.25);
   }
   .tb-cell{
-    padding:12px 18px;
+    padding:12px 14px;
     border-right:1px solid rgba(238,232,218,.18);
     border-bottom:1px solid rgba(238,232,218,.18);
+    min-width:0;
   }
   .tb-cell .k{ display:block; color:var(--hazard-2); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:4px; }
-  .tb-cell .v{ color:var(--paper); word-break:break-word; }
+  .tb-cell .v{ color:var(--paper); overflow-wrap:anywhere; }
+  .tb-cell.full{ grid-column:1 / -1; }
 
   /* ===== SHEET NUMBER DIVIDERS ===== */
   .sheet-no{
-    display:flex; align-items:center; gap:14px;
-    margin:0; padding:22px 28px 10px;
+    display:flex; align-items:center; gap:12px;
+    margin:0; padding:22px var(--gap) 10px;
   }
   .sheet-no .tag{
     font-family:'IBM Plex Mono', monospace;
@@ -120,18 +129,18 @@
     padding:4px 10px;
     white-space:nowrap;
   }
-  .sheet-no .rule{ flex:1; height:1px; background:repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 11px); }
+  .sheet-no .rule{ flex:1; height:1px; background:repeating-linear-gradient(90deg, var(--ink) 0 6px, transparent 6px 11px); min-width:12px; }
   .sheet-no h2{
     font-family:'Big Shoulders Display', sans-serif;
     font-weight:700;
-    font-size:22px;
+    font-size:clamp(16px,4.2vw,22px);
     letter-spacing:.03em;
     text-transform:uppercase;
     margin:0;
     white-space:nowrap;
   }
 
-  section{ padding:0 28px 8px; }
+  section{ padding:0 var(--gap) 8px; }
 
   /* ===== SUMMARY ===== */
   .summary p{
@@ -143,11 +152,18 @@
   }
 
   /* ===== BOM / SKILLS TABLE ===== */
+  .bom-wrap{
+    width:100%;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    margin-bottom:26px;
+    border:1px solid var(--line);
+  }
   .bom{
     width:100%;
+    min-width:480px; /* scrolls horizontally below this instead of crushing columns */
     border-collapse:collapse;
     font-size:13px;
-    margin-bottom:8px;
   }
   .bom thead th{
     text-align:left;
@@ -164,6 +180,7 @@
     vertical-align:top;
     line-height:1.55;
   }
+  .bom tbody tr:last-child td{ border-bottom:none; }
   .bom tbody tr:hover td{ background:rgba(31,58,82,.05); }
   .bom td.item-no{
     text-align:center;
@@ -172,53 +189,52 @@
     font-weight:600;
     border-right:1px solid var(--line);
   }
-  .bom td.item-name{ font-weight:600; width:190px; }
-  .bom td.item-name .sub{ display:block; font-weight:400; font-size:11.5px; color:var(--steel); margin-top:2px; font-family:'IBM Plex Mono', monospace; }
-  .bom{ margin-bottom:26px; }
+  .bom td.item-name{ font-weight:600; width:34%; }
 
   /* ===== EXPERIENCE — STEEL COLUMN TIMELINE ===== */
   .col-wrap{
     position:relative;
-    padding-left:34px;
+    padding-left:26px;
     margin-bottom:10px;
   }
   .col-wrap::before{
     content:"";
-    position:absolute; left:10px; top:6px; bottom:6px;
-    width:6px;
+    position:absolute; left:8px; top:6px; bottom:6px;
+    width:5px;
     background:
       repeating-linear-gradient(180deg, var(--blueprint) 0 3px, var(--blueprint-2) 3px 6px);
     border:1px solid var(--ink);
   }
   .node{
     position:relative;
-    padding:0 0 30px 22px;
+    padding:0 0 28px 26px;
   }
   .node:last-child{ padding-bottom:6px; }
   .node::before{ /* connection plate */
     content:"";
-    position:absolute; left:-40px; top:2px;
-    width:24px; height:24px;
+    position:absolute; left:-22px; top:2px;
+    width:20px; height:20px;
     background:var(--paper);
     border:3px solid var(--hazard);
     transform:rotate(45deg);
   }
   .node.current::before{ background:var(--hazard); }
   .node-head{
-    display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 14px;
+    display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 12px;
     margin-bottom:4px;
   }
   .node-role{
     font-family:'Big Shoulders Display', sans-serif;
-    font-weight:700; font-size:19px; text-transform:uppercase; letter-spacing:.01em;
+    font-weight:700; font-size:18px; text-transform:uppercase; letter-spacing:.01em;
   }
   .node-dates{
     font-family:'IBM Plex Mono', monospace;
-    font-size:11px; color:var(--paper);
+    font-size:10.5px; color:var(--paper);
     background:var(--blueprint-2);
     padding:2px 9px;
+    white-space:nowrap;
   }
-  .node-co{ font-size:13.5px; color:var(--steel); font-weight:600; margin-bottom:10px; }
+  .node-co{ font-size:13px; color:var(--steel); font-weight:600; margin-bottom:10px; }
   .node ul{ margin:0; padding-left:0; list-style:none; }
   .node li{
     position:relative;
@@ -233,7 +249,7 @@
 
   /* ===== TWO-COL LOWER ===== */
   .lower{ display:grid; grid-template-columns:1.3fr 1fr; gap:0 30px; padding-top:6px; }
-  @media (max-width:640px){ .lower{ grid-template-columns:1fr; } }
+  .block{ min-width:0; }
   .block h3{
     font-family:'IBM Plex Mono', monospace;
     font-size:11px; letter-spacing:.14em; text-transform:uppercase;
@@ -248,20 +264,21 @@
 
   .personal-grid{
     display:grid; grid-template-columns:1fr 1fr;
-    gap:8px 16px;
+    gap:10px 16px;
     font-size:12.5px;
   }
+  .personal-grid div{ min-width:0; overflow-wrap:anywhere; }
   .personal-grid div span.k{ display:block; font-family:'IBM Plex Mono', monospace; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--steel); margin-bottom:2px; }
 
   /* ===== DECLARATION / STAMP / DOWNLOAD ===== */
   .foot{
     margin-top:30px;
     border-top:3px solid var(--ink);
-    padding:22px 28px 26px;
-    display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:20px;
+    padding:22px var(--gap) 26px;
+    display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:18px;
     background:var(--paper-2);
   }
-  .decl{ max-width:46ch; font-size:11.5px; color:var(--steel); line-height:1.5; }
+  .decl{ max-width:46ch; font-size:11.5px; color:var(--steel); line-height:1.5; flex:1 1 220px; min-width:0; }
   .decl b{ color:var(--ink); }
 
   .stamp-btn{
@@ -277,9 +294,10 @@
     transform:rotate(-1.5deg);
     transition:transform .18s ease, background .18s ease;
     white-space:nowrap;
+    flex:0 0 auto;
   }
   .stamp-btn:hover{ transform:rotate(0deg) translateY(-2px); background:#A8501F; }
-  .stamp-btn svg{ width:16px; height:16px; }
+  .stamp-btn svg{ width:16px; height:16px; flex:0 0 auto; }
 
   @media print{
     body{ background:#fff; padding:0; }
@@ -287,11 +305,39 @@
     .stamp-btn{ display:none; }
   }
 
-  @media (max-width:560px){
-    .titleblock{ flex-direction:column; }
-    .tb-data{ border-left:none; border-top:2px solid rgba(238,232,218,.25); grid-template-columns:1fr 1fr; }
+  /* ---------- MOBILE ---------- */
+  @media (max-width:640px){
+    :root{ --gap:18px; }
+    body{ padding:14px 8px 40px; }
+    .lower{ grid-template-columns:1fr; gap:26px 0; }
     .bom{ font-size:12px; }
-    .foot{ flex-direction:column; align-items:flex-start; }
+    .foot{ flex-direction:column; align-items:stretch; }
+    .stamp-btn{ justify-content:center; }
+    .node-role{ font-size:16.5px; }
+  }
+
+  @media (max-width:480px){
+    :root{ --gap:14px; }
+    .tb-id{ flex-basis:100%; padding-bottom:16px; }
+    .tb-data{
+      flex-basis:100%;
+      border-left:none;
+      border-top:2px solid rgba(238,232,218,.25);
+      grid-template-columns:1fr 1fr;
+      font-size:11.5px;
+    }
+    .tb-cell{ padding:10px 12px; }
+    .sheet-no{ gap:8px; padding:18px var(--gap) 8px; }
+    .sheet-no .tag{ font-size:9.5px; padding:3px 7px; }
+    .col-wrap{ padding-left:18px; }
+    .node{ padding-left:20px; padding-bottom:24px; }
+    .node::before{ left:-18px; width:16px; height:16px; }
+    .node-dates{ font-size:10px; }
+  }
+
+  @media (max-width:360px){
+    .tb-data{ grid-template-columns:1fr; }
+    .tb-cell{ border-right:none; }
   }
 </style>
 </head>
@@ -313,12 +359,11 @@
       <div class="tb-role">Senior Steel Detailer / Tekla Modeler</div>
     </div>
     <div class="tb-data">
-      <div class="tb-cell"><span class="k">Phone</span><span class="v">+91 6240039175</span></div>
+      <div class="tb-cell"><span class="k">Phone</span><span class="v">+91 6204003917</span></div>
       <div class="tb-cell"><span class="k">Email</span><span class="v">sagirsana2019@gmail.com</span></div>
-      <div class="tb-cell"><span class="k">Location</span><span class="v">New Delhi, IN</span></div>
+      <div class="tb-cell full"><span class="k">Address</span><span class="v">A-43 Kanchan Kunj, New Delhi – 110076</span></div>
       <div class="tb-cell"><span class="k">Experience</span><span class="v">~15 yrs (9+ Tekla)</span></div>
-      <div class="tb-cell"><span class="k">Doc No.</span><span class="v">RES–SA–01</span></div>
-      <div class="tb-cell"><span class="k">Rev</span><span class="v">A</span></div>
+      <div class="tb-cell"><span class="k">Doc No.</span><span class="v">RES–SA–01 &nbsp;Rev A</span></div>
     </div>
   </header>
 
@@ -331,31 +376,33 @@
   <!-- BOM / SKILLS -->
   <div class="sheet-no"><span class="tag">SHEET 02</span><div class="rule"></div><h2>Bill of Materials — Skills</h2></div>
   <section>
-    <table class="bom">
-      <thead><tr><th>Item</th><th>Category</th><th>Specification</th></tr></thead>
-      <tbody>
-        <tr>
-          <td class="item-no">01</td>
-          <td class="item-name">Structural Modeling &amp; Detailing</td>
-          <td>Tekla Structures / X-Steel (v12.0 – v21.1), AutoCAD, wire-frame 3D modeling, connection application, structural steel package review</td>
-        </tr>
-        <tr>
-          <td class="item-no">02</td>
-          <td class="item-name">Documentation &amp; Output</td>
-          <td>Fabrication drawings, shop drawings, erection drawings, Bill of Materials (BOM)</td>
-        </tr>
-        <tr>
-          <td class="item-no">03</td>
-          <td class="item-name">Project Types</td>
-          <td>Industrial plants, power plants, refineries, commercial structures</td>
-        </tr>
-        <tr>
-          <td class="item-no">04</td>
-          <td class="item-name">Office &amp; Tools</td>
-          <td>MS Excel, MS Word, MS PowerPoint</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="bom-wrap">
+      <table class="bom">
+        <thead><tr><th>Item</th><th>Category</th><th>Specification</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="item-no">01</td>
+            <td class="item-name">Structural Modeling &amp; Detailing</td>
+            <td>Tekla Structures / X-Steel (v12.0 – v21.1), AutoCAD, wire-frame 3D modeling, connection application, structural steel package review</td>
+          </tr>
+          <tr>
+            <td class="item-no">02</td>
+            <td class="item-name">Documentation &amp; Output</td>
+            <td>Fabrication drawings, shop drawings, erection drawings, Bill of Materials (BOM)</td>
+          </tr>
+          <tr>
+            <td class="item-no">03</td>
+            <td class="item-name">Project Types</td>
+            <td>Industrial plants, power plants, refineries, commercial structures</td>
+          </tr>
+          <tr>
+            <td class="item-no">04</td>
+            <td class="item-name">Office &amp; Tools</td>
+            <td>MS Excel, MS Word, MS PowerPoint</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <!-- EXPERIENCE -->
@@ -379,7 +426,7 @@
       <div class="node">
         <div class="node-head">
           <span class="node-role">Steel Modeler &amp; Detailer</span>
-          <span class="node-dates">FEB 2014 – DEC 2020</span>
+          <span class="node-dates">AUG 2014 – DEC 2020</span>
         </div>
         <div class="node-co">Tech Steel Design Services Pvt. Ltd., Noida (U.P.)</div>
         <ul>
@@ -391,12 +438,24 @@
       <div class="node">
         <div class="node-head">
           <span class="node-role">Steel Detailer</span>
-          <span class="node-dates">SEP 2009 – AUG 2014</span>
+          <span class="node-dates">SEP 2012 – AUG 2014</span>
         </div>
         <div class="node-co">Simsona Engineering Services, New Delhi</div>
         <ul>
           <li>Executed wire-frame 3D structural modeling and connection application using Tekla Structures (X-Steel).</li>
           <li>Prepared and checked shop assembly drawings and erection drawings for structural steel projects.</li>
+        </ul>
+      </div>
+
+      <div class="node">
+        <div class="node-head">
+          <span class="node-role">Steel Modeler &amp; Detailer</span>
+          <span class="node-dates">NOV 2009 – JUL 2012</span>
+        </div>
+        <div class="node-co">Struo India Engineering Services, New Delhi</div>
+        <ul>
+          <li>Built wire-frame 3D structural models and executed connection modeling using Tekla Structures.</li>
+          <li>Generated fabrication and erection drawing packages for commercial and industrial projects.</li>
         </ul>
       </div>
 
@@ -425,7 +484,7 @@
         <div class="edu-item"><span class="deg">10th (Matriculation)</span><span class="inst">Bihar School Examination Board (B.S.E.B.), Patna</span></div>
 
         <h3 style="margin-top:22px;">Certifications &amp; Vocational Education</h3>
-        <div class="cert-item"><span class="deg">2-Year ITI Diploma — Draughtsman (Civil) with AutoCAD</span><span class="inst">M.M.R.M.T.I., Phulwari Sharif, Patna</span></div>
+        <div class="cert-item"><span class="deg">2-Year ITI Diploma — Draughtsman (Civil) with AutoCAD</span></div>
       </div>
 
       <div class="block">
@@ -446,7 +505,7 @@
       <b>Declaration —</b> I hereby declare that the information provided above is true and correct to the best of my knowledge and belief.<br>
       Place: New Delhi &nbsp;|&nbsp; Sagir Ahmad
     </div>
-    <a class="stamp-btn" id="downloadBtn" href="./Sagir_Ahmad_Resume .docx" download="Sagir_Ahmad_Resume.docx">
+    <a class="stamp-btn" id="downloadBtn" href="./Sagir_Ahmad_Resume.docx" download="Sagir_Ahmad_Resume.docx">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download .DOCX
     </a>
@@ -454,12 +513,6 @@
 </div>
 
 <script>
-  // Simple download wiring:
-  // Point the anchor's href above to wherever your .docx file lives
-  // (e.g. "/files/Sagir_Ahmad_Resume.docx" or a full URL). The `download`
-  // attribute controls the filename the browser saves it as.
-  // If you want a JS-driven fallback / analytics hook, this listener
-  // fires right before the native download starts.
   document.getElementById('downloadBtn').addEventListener('click', function () {
     console.log('Resume download triggered');
   });
